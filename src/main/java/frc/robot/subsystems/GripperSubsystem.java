@@ -28,10 +28,10 @@ public class GripperSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public GripperSubsystem() {
     m_motor = new CANSparkMax(Constants.Gripper.kGripperCanId, CANSparkMaxLowLevel.MotorType.kBrushless);
-    m_motor.setInverted(false);
+    m_motor.setInverted(true);
     m_motor.setSmartCurrentLimit(Constants.Gripper.kCurrentLimit);
-    m_motor.enableSoftLimit(SoftLimitDirection.kForward, true);
-    m_motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    m_motor.enableSoftLimit(SoftLimitDirection.kForward, true); //was true
+    m_motor.enableSoftLimit(SoftLimitDirection.kReverse, true); //was true
     m_motor.setSoftLimit(SoftLimitDirection.kForward, (float)Constants.Gripper.kSoftLimitForward);
     m_motor.setSoftLimit(SoftLimitDirection.kReverse, (float)Constants.Gripper.kSoftLimitReverse);
 
@@ -55,6 +55,14 @@ public class GripperSubsystem extends SubsystemBase {
 
   public void closeGripper() {
     m_setpoint = Constants.Gripper.kClosePosition;
+  }
+
+  public void unsafeOpenGripper(){
+    m_motor.set(.1);
+  }
+
+  public void unsafeCloseGripper(){
+    m_motor.set(-.1);
   }
 
   @Override

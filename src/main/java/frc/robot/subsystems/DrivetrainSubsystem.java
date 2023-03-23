@@ -9,43 +9,29 @@ import edu.wpi.first.math.MathUtil;
 
 import frc.robot.Constants;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.CANSparkMax.IdleMode;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class DrivetrainSubsystem extends SubsystemBase {
-  private CANSparkMax m_frontLeftMotor;
-  private CANSparkMax m_frontRightMotor;
-  private CANSparkMax m_rearLeftMotor;
-  private CANSparkMax m_rearRightMotor;
+  private Spark m_frontLeftMotor;
+  private Spark m_frontRightMotor;
+  private Spark m_rearLeftMotor;
+  private Spark m_rearRightMotor;
 
   /** Creates a new DrivetrainSubsystem. */
   public DrivetrainSubsystem() {
-    m_frontLeftMotor  = new CANSparkMax(Constants.Drivetrain.kFrontLeftCanId, CANSparkMaxLowLevel.MotorType.kBrushless);
+    m_frontLeftMotor  = new Spark(Constants.Drivetrain.kFrontLeftPWMId);
     m_frontLeftMotor.setInverted(Constants.Drivetrain.kFrontLeftInverted);
-    m_frontLeftMotor.setSmartCurrentLimit(Constants.Drivetrain.kCurrentLimit);
-    m_frontLeftMotor.setIdleMode(IdleMode.kBrake);
-    m_frontLeftMotor.burnFlash();
 
-    m_frontRightMotor = new CANSparkMax(Constants.Drivetrain.kFrontRightCanId, CANSparkMaxLowLevel.MotorType.kBrushless);
+    m_frontRightMotor = new Spark(Constants.Drivetrain.kFrontRightPWMId);
     m_frontRightMotor.setInverted(Constants.Drivetrain.kFrontRightInverted);
-    m_frontRightMotor.setSmartCurrentLimit(Constants.Drivetrain.kCurrentLimit);
-    m_frontRightMotor.setIdleMode(IdleMode.kBrake);
-    m_frontRightMotor.burnFlash();
 
-    m_rearLeftMotor   = new CANSparkMax(Constants.Drivetrain.kRearLeftCanId, CANSparkMaxLowLevel.MotorType.kBrushless);
+    m_rearLeftMotor = new Spark(Constants.Drivetrain.kRearLeftPWMId);
     m_rearLeftMotor.setInverted(Constants.Drivetrain.kRearLeftInverted);
-    m_rearLeftMotor.setSmartCurrentLimit(Constants.Drivetrain.kCurrentLimit);
-    m_rearLeftMotor.setIdleMode(IdleMode.kBrake);
-    m_rearLeftMotor.burnFlash();
 
-    m_rearRightMotor  = new CANSparkMax(Constants.Drivetrain.kRearRightCanId, CANSparkMaxLowLevel.MotorType.kBrushless);
+    m_rearRightMotor = new Spark(Constants.Drivetrain.kRearRightPWMId);
     m_rearRightMotor.setInverted(Constants.Drivetrain.kRearRightInverted);
-    m_rearRightMotor.setSmartCurrentLimit(Constants.Drivetrain.kCurrentLimit);
-    m_rearRightMotor.setIdleMode(IdleMode.kBrake);
-    m_rearRightMotor.burnFlash();
   }
 
   public void driveArcade(double _straight, double _turn) {

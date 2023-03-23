@@ -6,8 +6,11 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Commands.AutonomousDrive;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BrakeSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.GripperSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,8 +35,12 @@ public class RobotContainer {
   private final GripperSubsystem m_gripper = new GripperSubsystem();
   private final ArmSubsystem m_arm = new ArmSubsystem();
   private final DrivetrainSubsystem m_drivetrain = new DrivetrainSubsystem();
+  private final BrakeSubsystem m_brakes = new BrakeSubsystem();
 
-  private XboxController m_driveController = new XboxController(Constants.OIConstants.kDriverController); 
+  private final AutonomousDrive auto_drive = new AutonomousDrive(m_drivetrain);
+
+  private Joystick m_driveController = new Joystick(Constants.OIConstants.kDriverController); 
+  private XboxController m_assistantController = new XboxController(Constants.OIConstants.kAssistantController);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -52,24 +59,32 @@ public class RobotContainer {
     m_drivetrain.setDefaultCommand(new RunCommand(
       () -> 
         m_drivetrain.driveArcade(
-          MathUtil.applyDeadband(- m_driveController.getLeftY(), Constants.OIConstants.kDriveDeadband),
-          MathUtil.applyDeadband(m_driveController.getRightX()*Constants.Drivetrain.kTurningScale, Constants.OIConstants.kDriveDeadband))
+          MathUtil.applyDeadband(- m_driveController.getY(), Constants.OIConstants.kDriveDeadband),
+          MathUtil.applyDeadband(- m_driveController.getX() * Constants.Drivetrain.kTurningScale, Constants.OIConstants.kDriveDeadband))
       , m_drivetrain)
     );
 
     //set up gripper open/close
-    new JoystickButton(m_driveController, XboxController.Button.kRightBumper.value)
+    new JoystickButton(m_assistantController, XboxController.Button.kRightBumper.value)
       .onTrue(new InstantCommand(() -> m_gripper.openGripper()))
       .onFalse(new InstantCommand(() -> m_gripper.closeGripper()));
 
+  /*
+    //set up alternate gripper open/close UNSAFE
+    new JoystickButton(m_driveController, 10)
+      .onTrue(new InstantCommand(() -> m_gripper.unsafeOpenGripper()));
+    new JoystickButton(m_driveController, 11)
+      .onTrue(new InstantCommand(() -> m_gripper.unsafeCloseGripper()));
+  */
+
     //set up arm preset positions
-    new JoystickButton(m_driveController, XboxController.Button.kA.value)
+    new JoystickButton(m_assistantController, XboxController.Button.kA.value)
       .onTrue(new InstantCommand(() -> m_arm.setTargetPosition(Constants.Arm.kHomePosition, m_gripper)));
-    new JoystickButton(m_driveController, XboxController.Button.kX.value)
+    new JoystickButton(m_assistantController, XboxController.Button.kX.value)
       .onTrue(new InstantCommand(() -> m_arm.setTargetPosition(Constants.Arm.kScoringPosition, m_gripper)));
-    new JoystickButton(m_driveController, XboxController.Button.kY.value)
+    new JoystickButton(m_assistantController, XboxController.Button.kY.value)
       .onTrue(new InstantCommand(() -> m_arm.setTargetPosition(Constants.Arm.kIntakePosition, m_gripper)));
-    new JoystickButton(m_driveController, XboxController.Button.kB.value)
+    new JoystickButton(m_assistantController, XboxController.Button.kB.value)
       .onTrue(new InstantCommand(() -> m_arm.setTargetPosition(Constants.Arm.kFeederPosition, m_gripper)));
 
     //set up arm manual and auto functions
@@ -79,19 +94,25 @@ public class RobotContainer {
       , m_arm)
     );
     new Trigger(() -> 
-      Math.abs(m_driveController.getRightTriggerAxis() - m_driveController.getLeftTriggerAxis()) > Constants.OIConstants.kArmManualDeadband
+      Math.abs(m_assistantController.getRightTriggerAxis() - m_assistantController.getLeftTriggerAxis()) > Constants.OIConstants.kArmManualDeadband
       ).whileTrue(new RunCommand(
         () ->
-          m_arm.runManual((m_driveController.getRightTriggerAxis() - m_driveController.getLeftTriggerAxis()) * Constants.OIConstants.kArmManualScale)
-        , m_arm));
-  }
+          m_arm.runManual((- m_assistantController.getRightTriggerAxis() + m_assistantController.getLeftTriggerAxis()) * Constants.OIConstants.kArmManualScale)
+        , m_arm)); //was m_assistant.grta() - m_assistant.glta()
 
+    //set up braking commands
+    //TODO: Determine Joystick Buttons for Braking, Add to Constants.java
+    new JoystickButton(m_driveController, 1)
+      .onTrue(new InstantCommand(() -> m_brakes.brakingOn()));
+    new JoystickButton(m_driveController, 2)
+      .onTrue(new InstantCommand(() -> m_brakes.brakingOff()));
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    return null;
+  public Command getAutonomousCommand() {   
+    return auto_drive;
   }
 }

@@ -35,12 +35,12 @@ public class ArmSubsystem extends SubsystemBase {
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
     m_motor = new CANSparkMax(Constants.Arm.kArmCanId, CANSparkMaxLowLevel.MotorType.kBrushless);
-    m_motor.setInverted(false);
+    m_motor.setInverted(Constants.Arm.kArmInverted);
     m_motor.setSmartCurrentLimit(Constants.Arm.kCurrentLimit);
-    m_motor.enableSoftLimit(SoftLimitDirection.kForward, true);
-    m_motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
-    m_motor.setSoftLimit(SoftLimitDirection.kForward, (float)Constants.Arm.kSoftLimitForward);
-    m_motor.setSoftLimit(SoftLimitDirection.kReverse, (float)Constants.Arm.kSoftLimitReverse);
+    m_motor.enableSoftLimit(SoftLimitDirection.kForward, false); //was true
+    m_motor.enableSoftLimit(SoftLimitDirection.kReverse, false); //was true
+    m_motor.setSoftLimit(SoftLimitDirection.kReverse, (float)Constants.Arm.kSoftLimitForward);
+    m_motor.setSoftLimit(SoftLimitDirection.kForward, (float)Constants.Arm.kSoftLimitReverse);
 
     m_encoder = m_motor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
     m_encoder.setPositionConversionFactor(Constants.Arm.kArmGearRatio);
