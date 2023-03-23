@@ -60,9 +60,16 @@ public final class Constants {
         public static final double kSoftLimitReverse = 0.0;
         public static final double kSoftLimitForward = 4.6;
 
+<<<<<<< HEAD
         public static final double kArmGearRatio = 1 / (32 * 4) * 2 * Math.PI; //multiply SM value by this number and get arm position in radians (PREVIOUSLY 48)
+=======
+        public static final double kArmGearRatio = 1.0 / (48.0 * 4.0); 
+        public static final double kPositionFactor = kArmGearRatio * 2.0 * Math.PI; //multiply SM value by this number and get arm position in radians
+        public static final double kVelocityFactor = kArmGearRatio * 2.0 * Math.PI / 60.0;
+        public static final double kArmFreeSpeed = 5676.0 * kVelocityFactor;
+>>>>>>> 528a508a7eb6b53334f405501db7e71b1021b3ef
         public static final double kArmZeroCosineOffset = - Math.PI / 6; //radians to add to converted arm position to get real-world arm position (starts at ~30deg angle)
-        public static final ArmFeedforward kArmFeedforward = new ArmFeedforward(0.0, 0.4, 12/3.09577776, 0.0);
+        public static final ArmFeedforward kArmFeedforward = new ArmFeedforward(0.0, 0.4, 12.0/kArmFreeSpeed, 0.0);
         public static final PIDGains kArmPositionGains = new PIDGains(0.6, 0.0, 0.0);
         public static final TrapezoidProfile.Constraints kArmMotionConstraint = new TrapezoidProfile.Constraints(-2.0, -2.0);
 
